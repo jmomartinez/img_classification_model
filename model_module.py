@@ -1,5 +1,4 @@
 from tensorflow.keras.models import Sequential, save_model
-from tensorflow.keras.datasets import fashion_mnist, mnist
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPool2D
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 from sklearn.pipeline import Pipeline
@@ -7,7 +6,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import img_class_module
+import preprocessing_module
 
 
 class img_model():

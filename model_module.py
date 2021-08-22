@@ -1,15 +1,18 @@
 from tensorflow.keras.models import Sequential, save_model
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPool2D
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPool2D, GlobalAveragePooling2D
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 from sklearn.model_selection import train_test_split, GridSearchCV
+from tensorflow.keras.applications.resnet import ResNet50
+from tensorflow.keras.applications import EfficientNetB0
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from preprocessing_module import preprocessing
 
 
-class img_model():
-    def __init__(self,epochs,input_shape,pool_size,kernel_size,path,data_choice,trans):
+class basic_cnn():
+
+    def __init__(self,epochs,input_shape,pool_size,kernel_size,path,data_choice,trans,greyscale):
         self.epochs = epochs
         self.input_shape = input_shape
         self.pool_size = pool_size
@@ -17,8 +20,9 @@ class img_model():
         self.path = path
         self.choice = data_choice
         self.trans = trans
+        self.greyscale = greyscale
 
-        preprocessing_obj = preprocessing(self.choice,self.trans,self.path,(386, 354))
+        preprocessing_obj = preprocessing(self.choice,self.trans,self.path,(386, 354),self.greyscale)
         train_iterator, val_iterator = preprocessing_obj.generator_init()
         self.train_it = train_iterator
         self.test_it = val_iterator
@@ -68,3 +72,38 @@ class img_model():
         plt.ylabel('Loss')
         plt.title('Epochs vs Loss')
         plt.show()
+
+class resNet(basic_cnn):
+    def __init__(self,epochs,input_shape,pool_size,kernel_size,path,data_choice,trans,greyscale):
+        super().__init__(epochs,input_shape,pool_size,kernel_size,path,data_choice,trans,greyscale)
+
+    def create_model(self):
+        resNet = ResNet50(input_shape=self.input_shape,include_top=False,weights='imagenet')
+
+        model = Sequential()
+        model.add(resNet)
+        model.add(GlobalAveragePooling2D())
+        model.add(Flatten())
+        model.add(Dense(2,activation='softmax'))
+
+        model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+        print(model.summary())
+        return model
+        
+
+class efficientNet(basic_cnn):
+    def __init__(self,epochs,input_shape,pool_size,kernel_size,path,data_choice,trans,greyscale):
+        super().__init__(epochs,input_shape,pool_size,kernel_size,path,data_choice,trans,greyscale)
+
+    def create_model(self):
+        effNet = EfficientNetB0(include_top=False,weights='imagenet',input_shape=self.input_shape)
+
+        model = Sequential()
+        model.add(effNet)
+        model.add(GlobalAveragePooling2D())
+        model.add(Flatten())
+        model.add(Dense(2,activation='softmax'))
+
+        model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+        print(model.summary())
+        return model

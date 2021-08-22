@@ -9,11 +9,12 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 
 class preprocessing():
-    def __init__(self,data_choice,transformation,path,input_shape):
+    def __init__(self,data_choice,transformation,path,input_shape,greyscale):
         self.data_choice = data_choice
         self.transformation = transformation
         self.path = path
         self.input_shape = input_shape
+        self.greyscale = greyscale
 
     def datagen_flow(self,data):
         (x_train,y_train),(x_test,y_test) = data
@@ -49,11 +50,18 @@ class preprocessing():
             # scale_factor = float((1-x_train.min())/(x_train.max()-x_train.min()))
             datagen = ImageDataGenerator(rescale = 1.0/255.0, validation_split=.15)
 
-            train_iterator = datagen.flow_from_directory(self.path,batch_size=15,
-            target_size = self.input_shape,color_mode='grayscale',subset='training',class_mode='binary')
-            
-            val_iterator = datagen.flow_from_directory(self.path,batch_size=5,
-            target_size = self.input_shape,color_mode='grayscale',subset='validation',class_mode='binary')
+            if self.greyscale == True:
+                train_iterator = datagen.flow_from_directory(self.path,batch_size=15,
+                target_size = self.input_shape,color_mode='grayscale',subset='training',class_mode='binary')
+                
+                val_iterator = datagen.flow_from_directory(self.path,batch_size=5,
+                target_size = self.input_shape,color_mode='grayscale',subset='validation',class_mode='binary')
+            elif self.greyscale == False:
+                train_iterator = datagen.flow_from_directory(self.path,batch_size=15,
+                target_size = self.input_shape,subset='training',class_mode='binary')
+                
+                val_iterator = datagen.flow_from_directory(self.path,batch_size=5,
+                target_size = self.input_shape,subset='validation',class_mode='binary')
             return train_iterator,val_iterator
 
     def generator_init(self):

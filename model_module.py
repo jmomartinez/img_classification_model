@@ -72,14 +72,15 @@ class basic_cnn():
         plt.ylabel('Loss')
         plt.title('Epochs vs Loss')
         plt.show()
-
+        
+# The core idea of ResNet is introducing a so-called “identity shortcut connection” that skips one or more layers
 class resNet(basic_cnn):
     def __init__(self,epochs,input_shape,pool_size,kernel_size,path,data_choice,trans,greyscale):
         super().__init__(epochs,input_shape,pool_size,kernel_size,path,data_choice,trans,greyscale)
 
     def create_model(self):
         resNet = ResNet50(input_shape=self.input_shape,include_top=False,weights='imagenet')
-
+        resNet.trainable = False # avoid overfitting
         model = Sequential()
         model.add(resNet)
         model.add(GlobalAveragePooling2D())

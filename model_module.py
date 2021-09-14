@@ -33,7 +33,7 @@ class basic_cnn():
         k_size = self.kernel_size
 
         model = Sequential()
-        model.add(Conv2D(filters=32,kernel_size = k_size,activation='relu',input_shape=input_shape))
+        model.add(Conv2D(filters=32,kernel_size=k_size,activation='relu',input_shape=input_shape))
         model.add(MaxPool2D(pool_size=p_size))
 
         model.add(Conv2D(filters=64,kernel_size = k_size,activation='relu'))
@@ -89,8 +89,7 @@ class resNet(basic_cnn):
 
         model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['accuracy'])
         print(model.summary())
-        return model
-        
+        return model    
 
 class efficientNet(basic_cnn):
     def __init__(self,epochs,input_shape,pool_size,kernel_size,path,data_choice,trans,greyscale):
